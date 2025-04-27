@@ -38,30 +38,15 @@ local Tabs = {
         Main3=Window:AddTab({ Title="Farm Chest" }),
         Main4=Window:AddTab({ Title="Script Hop" }),
 }
+    
     Tabs.Main0:AddButton({
-    Title = "Discord",
-    Description = "TBoyRoblox Community",
-    Callback = function()
-        setclipboard("https://discord.gg/tboyroblox-community-1253927333920899153")
-    end
-})
-
-    Tabs.Main0:AddButton({
-    Title = "Youtuber",
+    Title = "người tạo",
     Description = "sonackek Roblox",
     Callback = function()
-        setclipboard("https://www.youtube.com/@TBoyRoblox08")
+        setclipboard("con cặc")
     end
 })
 
-    Tabs.Main0:AddButton({
-    Title = "Youtuber",
-    Description = "Gamer",
-    Callback = function()
-        setclipboard("https://www.youtube.com/@TBoyGamer08")
-    end
-})
-    
     Tabs.Main1:AddButton({
     Title="Redz Hub",
     Description="",
@@ -80,5 +65,85 @@ Tabs.Main1:AddButton({
     Description="",
     Callback=function()
 	  loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaAnarchist/GreenZ-Hub/refs/heads/main/KaitunDoughKing.lua"))()
+  end
+})
+
+Tabs.Main1:AddButton({
+    Title="Hub",
+    Description="",
+    Callback=function()
+	  
+  end
+})
+
+Tabs.Main1:AddButton({
+    Title="Hub",
+    Description="",
+    Callback=function()
+	  
+  end
+})
+
+Tabs.Main1:AddButton({
+    Title="Hub",
+    Description="",
+    Callback=function()
+	  
+  end
+})
+
+Tabs.Main1:AddButton({
+    Title="Hub",
+    Description="",
+    Callback=function()
+	  
+  end
+})
+
+Tabs.Main1:AddButton({
+    Title="Hub",
+    Description="",
+    Callback=function()
+	  
+  end
+})
+
+Tabs.Main1:AddButton({
+    Title="Hub",
+    Description="",
+    Callback=function()
+	  
+  end
+})
+
+Tabs.Main1:AddButton({
+    Title="Hub",
+    Description="",
+    Callback=function()
+	  
+  end
+})
+
+Tabs.Main1:AddButton({
+    Title="Hub",
+    Description="",
+    Callback=function()
+	  
+  end
+})
+
+Tabs.Main1:AddButton({
+    Title="Hub",
+    Description="",
+    Callback=function()
+	  
+  end
+})
+
+Tabs.Main1:AddButton({
+    Title="Hub",
+    Description="",
+    Callback=function()
+	  
   end
 })
