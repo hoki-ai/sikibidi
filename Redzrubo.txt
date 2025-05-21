@@ -1,0 +1,64 @@
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
+
+local Window = redzlib:MakeWindow({
+  Title = "rubo Roblox",
+  SubTitle = "by rubo",
+  SaveFolder = "Redz | redz lib v5.lua"
+})
+
+Window:AddMinimizeButton({
+    Button = { Image = "rbxassetid://82083472602102", BackgroundTransparency = 0 },
+    Corner = { CornerRadius = UDim.new(0, 5) },
+})
+
+local Tab = Window:MakeTab({"Discord", "info"})
+
+Tab:AddDiscordInvite({
+    Name = "redz Hub | Community",
+    Description = "Join our discord community to receive information about the next update",
+    Logo = "rbxassetid://82083472602102",
+    Invite = "haconcac",
+})
+
+local Tab2 = Window:MakeTab({"Farm", "home"})
+
+local Dropdown = Tab2:AddDropdown({
+  Name = "Chọn Công Cụ",
+  Description = "Chọn công cụ bạn muốn sử dụng",
+  Options = {"Melee", "Blox Fruit", "Sword"},
+  Default = "Melee",
+  Flag = "Melee",
+  Callback = function()
+    
+  end
+})
+
+local Dropdown = Tab1:AddDropdown({
+  Name = "Kích Thước Ui",
+  Description = "Điều chỉnh kích thước giao diện",
+  Options = {"Small", "Medium", "Large", "Bigger"},
+  Default = "Large",
+  Flag = "Large",
+  Callback = function()
+    
+  end
+})
+
+----- Tab
+     local Tab2o = MakeTab({Name = "SCRIPT farm"})
+------- BUTTON
+
+     AddButton(Tab1o, {
+     Name = "KIMP GAMING V2",
+    Callback = function()
+	 loadstring(game:HttpGet("https://raw.githubusercontent.com/Tuyenhuu1122/KimP-Ver2/refs/heads/main/Kimproblox", true))()
+  end
+  })
+  
+   AddButton(Tab1o, {
+     Name = "redz hub",
+    Callback = function()
+	 loadstring(game:HttpGet("loadstring(game:HttpGet("https://raw.githubusercontent.com/newredz/BloxFruits/refs/heads/main/Source.luau"))(Settings)"))()
+  end
+  }) 
+
