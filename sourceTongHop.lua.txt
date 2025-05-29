@@ -1,0 +1,996 @@
+_G.FastAttack = true
+
+if _G.FastAttack then
+    local _ENV = (getgenv or getrenv or getfenv)()
+
+    local function SafeWaitForChild(parent, childName)
+        local success, result = pcall(function()
+            return parent:WaitForChild(childName)
+        end)
+        if not success or not result then
+            warn("noooooo: " .. childName)
+        end
+        return result
+    end
+
+    local function WaitChilds(path, ...)
+        local last = path
+        for _, child in {...} do
+            last = last:FindFirstChild(child) or SafeWaitForChild(last, child)
+            if not last then break end
+        end
+        return last
+    end
+
+    local VirtualInputManager = game:GetService("VirtualInputManager")
+    local CollectionService = game:GetService("CollectionService")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local TeleportService = game:GetService("TeleportService")
+    local RunService = game:GetService("RunService")
+    local Players = game:GetService("Players")
+    local Player = Players.LocalPlayer
+
+    if not Player then
+        warn("Không tìm thấy người chơi cục bộ.")
+        return
+    end
+
+    local Remotes = SafeWaitForChild(ReplicatedStorage, "Remotes")
+    if not Remotes then return end
+
+    local Validator = SafeWaitForChild(Remotes, "Validator")
+    local CommF = SafeWaitForChild(Remotes, "CommF_")
+    local CommE = SafeWaitForChild(Remotes, "CommE")
+
+    local ChestModels = SafeWaitForChild(workspace, "ChestModels")
+    local WorldOrigin = SafeWaitForChild(workspace, "_WorldOrigin")
+    local Characters = SafeWaitForChild(workspace, "Characters")
+    local Enemies = SafeWaitForChild(workspace, "Enemies")
+    local Map = SafeWaitForChild(workspace, "Map")
+
+    local EnemySpawns = SafeWaitForChild(WorldOrigin, "EnemySpawns")
+    local Locations = SafeWaitForChild(WorldOrigin, "Locations")
+
+    local RenderStepped = RunService.RenderStepped
+    local Heartbeat = RunService.Heartbeat
+    local Stepped = RunService.Stepped
+
+    local Modules = SafeWaitForChild(ReplicatedStorage, "Modules")
+    local Net = SafeWaitForChild(Modules, "Net")
+
+    local sethiddenproperty = sethiddenproperty or function(...) return ... end
+    local setupvalue = setupvalue or (debug and debug.setupvalue)
+    local getupvalue = getupvalue or (debug and debug.getupvalue)
+
+    local Settings = {
+        AutoClick = true,
+        ClickDelay = 0,0000000000000001
+    }
+
+    local Module = {}
+
+    Module.FastAttack = (function()
+        if _ENV.rz_FastAttack then
+            return _ENV.rz_FastAttack
+        end
+
+        local FastAttack = {
+            Distance = 200,
+            attackMobs = true,
+            attackPlayers = true,
+            Equipped = nil
+        }
+
+        local RegisterAttack = SafeWaitForChild(Net, "RE/RegisterAttack")
+        local RegisterHit = SafeWaitForChild(Net, "RE/RegisterHit")
+
+        local function IsAlive(character)
+        return character and character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0
+        end
+
+        local function ProcessEnemies(OthersEnemies, Folder)
+            local BasePart = nil
+            for _, Enemy in Folder:GetChildren() do
+                local Head = Enemy:FindFirstChild("Head")
+                if Head and IsAlive(Enemy) and Player:DistanceFromCharacter(Head.Position) < FastAttack.Distance then
+                    if Enemy ~= Player.Character then
+                        table.insert(OthersEnemies, { Enemy, Head })
+                        BasePart = Head
+                    end
+                end
+            end
+            return BasePart
+        end
+
+        function FastAttack:Attack(BasePart, OthersEnemies)
+            if not BasePart or #OthersEnemies == 0 then return end
+            RegisterAttack:FireServer(Settings.ClickDelay or 0)
+            RegisterHit:FireServer(BasePart, OthersEnemies)
+        end
+
+        function FastAttack:AttackNearest()
+            local OthersEnemies = {}
+            local Part1 = ProcessEnemies(OthersEnemies, Enemies)
+            local Part2 = ProcessEnemies(OthersEnemies, Characters)
+            if #OthersEnemies > 0 then
+                self:Attack(Part1 or Part2, OthersEnemies)
+            else
+                task.wait(0)
+            end
+        end
+
+        function FastAttack:BladeHits()
+            local Equipped = IsAlive(Player.Character) and Player.Character:FindFirstChildOfClass("Tool")
+            if Equipped and Equipped.ToolTip ~= "Gun" then
+                self:AttackNearest()
+            else
+                task.wait(0)
+            end
+        end
+
+        task.spawn(function()
+            while task.wait(Settings.ClickDelay) do
+                if Settings.AutoClick then
+                    FastAttack:BladeHits()
+                end
+            end
+        end)
+
+        _ENV.rz_FastAttack = FastAttack
+        return FastAttack
+    end)()
+end
+
+-- Check Executor 
+local executor = getexecutorname() or identifyexecutor()
+
+if executor then
+    local supportedExecutors = {
+        "Velocity",
+        "Wave",
+        "Arceus",
+        "Swift",
+        "AWP",
+        "Macsploit",
+        "Delta",
+        "Fluxus",
+        "CodeX",
+        "Krnl",
+        "Trigon",
+        "Evon",
+        "Cryptic",
+        "SynapeX",
+        "Potassium",
+        "Argon",
+        "Xeno",
+        "Nezur",
+        "Revelix",
+        "Cubix",
+        "Solara",
+        "Dynamic",
+        "Nebula",
+        "Ronix",
+        "Atlantis",
+        "JJsploit",
+        "Frostware"
+    }
+
+    local isExecutorSupported = false
+    for _, name in ipairs(supportedExecutors) do
+        if string.find(executor, name) then
+            isExecutorSupported = true
+            break
+        end
+    end
+
+    if isExecutorSupported then
+        print("Supported Executor!")
+    else
+        game.Players.LocalPlayer:Kick("Not supported TNG Skid executor!") -- kick nếu exec ko support
+    end
+end
+
+repeat
+    wait()
+until game:IsLoaded() and game.Players.LocalPlayer
+
+print("Whitelist success!")
+wait(.5)
+game.StarterGui:SetCore("SendNotification", {
+     Title = "Rubo DepZai TH";
+     Text = "Đăng Tải";
+     Icon = "";
+     Duration = "2";
+})
+
+wait(.1)
+
+
+----------------------------------------ToogleUi----------------------------------------
+
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local ImageLabel = Instance.new("ImageLabel")
+local UICorner = Instance.new("UICorner")
+local TextButton = Instance.new("TextButton")
+
+ScreenGui.Parent = game:GetService("CoreGui")  
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Frame.Parent = ScreenGui
+Frame.AnchorPoint = Vector2.new(0.1, 0.1)
+Frame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+Frame.BackgroundTransparency = 0
+Frame.BorderColor3 = Color3.fromRGB(27, 42, 53)
+Frame.BorderSizePixel = 1
+Frame.Position = UDim2.new(0, 20, 0.1, -6)  
+Frame.Size = UDim2.new(0, 50, 0, 50)
+Frame.Name = "dut dit"
+
+ImageLabel.Parent = Frame
+ImageLabel.Name = "Banana Test"
+ImageLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+ImageLabel.Position = UDim2.new(0.5, 0, 0.5, 0)
+ImageLabel.Size = UDim2.new(0, 40, 0, 40)
+ImageLabel.BackgroundColor3 = Color3.fromRGB(163, 162, 165)
+ImageLabel.BackgroundTransparency = 1
+ImageLabel.BorderSizePixel = 1
+ImageLabel.BorderColor3 = Color3.fromRGB(27, 42, 53)
+ImageLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
+ImageLabel.Image = "http://www.roblox.com/asset/?id=82083472602102"
+
+UICorner.CornerRadius = UDim.new(1, 0)
+UICorner.Parent = Frame
+
+TextButton.Name = "TextButton"
+TextButton.Parent = Frame
+TextButton.AnchorPoint = Vector2.new(0, 0)
+TextButton.Position = UDim2.new(0, 0, 0, 0)
+TextButton.Size = UDim2.new(1, 0, 1, 0)
+TextButton.BackgroundColor3 = Color3.fromRGB(163, 162, 165)
+TextButton.BackgroundTransparency = 1
+TextButton.BorderSizePixel = 1
+TextButton.BorderColor3 = Color3.fromRGB(27, 42, 53)
+TextButton.TextColor3 = Color3.fromRGB(27, 42, 53)
+TextButton.Text = ""
+TextButton.Font = Enum.Font.SourceSans
+TextButton.TextSize = 8
+TextButton.TextTransparency = 0
+
+local TweenService = game:GetService("TweenService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+
+local zoomedIn = false
+local originalSize = UDim2.new(0, 40, 0, 40)
+local zoomedSize = UDim2.new(0, 30, 0, 30)
+local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+local faded = false
+local fadeInTween = TweenService:Create(Frame, tweenInfo, {BackgroundTransparency = 0.25})
+local fadeOutTween = TweenService:Create(Frame, tweenInfo, {BackgroundTransparency = 0})
+
+TextButton.MouseButton1Down:Connect(function()
+
+    if zoomedIn then
+        TweenService:Create(ImageLabel, tweenInfo, {Size = originalSize}):Play()
+    else
+        TweenService:Create(ImageLabel, tweenInfo, {Size = zoomedSize}):Play()
+    end
+    zoomedIn = not zoomedIn
+
+    if faded then
+        fadeOutTween:Play()
+    else
+        fadeInTween:Play()
+    end
+    faded = not faded
+
+    VirtualInputManager:SendKeyEvent(true, "LeftControl", false, game)
+end)
+
+print("Loading Main Ui")
+wait(.1)
+game.StarterGui:SetCore("SendNotification", {
+     Title = "Rubo DZ Hub";
+     Text = "Đăng Tải dao diện người dùng";
+     Icon = "";
+     Duration = "2";
+})
+wait(.1)
+
+----------------------------------------Fluent----------------------------------------
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "Rubo DepZai Hub",
+    SubTitle = "by rubo",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(450, 300),
+    Acrylic = true, 
+    Theme = "Light",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+----------------------------------------Tab----------------------------------------
+local Tabs = {
+    1 = Window:AddTab({ Title = "Người chơi", Icon = "" }),
+    2 = Window:AddTab({ Title = "Blox Fruits", Icon = "" }),
+    3 = Window:AddTab({ Title = "Cá", Icon = "" }),
+    4 = Window:AddTab({ Title = "Cài đặt", Icon = "" }),
+    5 = Window:AddTab({ Title = "Thông tin", Icon = "" }),
+}
+----------------------------------------LP----------------------------------------
+print("Loading Local Player Tab")
+wait(1)
+Tabs.1:AddButton(
+        {
+            Title = "nhảy cao vô hạn",
+            Description = "",
+            Callback = function()
+                local InfiniteJumpEnabled = true
+                game:GetService("UserInputService").JumpRequest:connect(
+                    function()
+                        if InfiniteJumpEnabled then
+                            game:GetService "Players".LocalPlayer.Character:FindFirstChildOfClass "Humanoid":ChangeState(
+                                "Jumping"
+                            )
+                        end
+                    end
+                )
+            end
+        }
+    )
+
+    Tabs.1:AddButton(
+        {
+            Title = "Chống AFK",
+            Description = "Chống AFK/Idle",
+            Callback = function()
+                local VirtualUser = game:GetService("VirtualUser")
+
+                game:GetService("Players").LocalPlayer.Idled:Connect(
+                    function()
+                        VirtualUser:CaptureController()
+                        VirtualUser:ClickButton2(Vector2.new())
+                    end
+                )
+            end
+        }
+    )
+
+    local RunService = game:GetService("RunService")
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local noClipEnabled = false
+    local noClipConnection = nil
+
+    local function EnableNoClip()
+        noClipEnabled = true
+        noClipConnection =
+            RunService.Stepped:Connect(
+            function()
+                for _, part in pairs(Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        )
+    end
+
+    local function DisableNoClip()
+        noClipEnabled = false
+        if noClipConnection then
+            noClipConnection:Disconnect()
+            noClipConnection = nil
+        end
+    end
+
+    -- Nút bật NoClip
+    Tabs.1:AddButton(
+        {
+            Title = "Đi xuyên tường",
+            Description = "",
+            Callback = function()
+                EnableNoClip()
+            end
+        }
+    )
+
+    -- Nút tắt NoClip
+    Tabs.1:AddButton(
+        {
+            Title = "ko đi xuyên",
+            Description = "",
+            Callback = function()
+                DisableNoClip()
+            end
+        }
+    )
+
+    Tabs.1:AddButton(
+        {
+            Title = "Xóa xương mù",
+            Description = "xóa hết xương mù",
+            Callback = function()
+                local function removeFog()
+                    local lighting = game:GetService("Lighting")
+                    lighting.FogEnd = 1e10
+                    lighting.FogStart = 1e10
+                    lighting.FogColor = Color3.new(1, 1, 1)
+                end
+
+                removeFog()
+            end
+        }
+    )
+
+    Tabs.1:AddButton(
+        {
+            Title = "Full Bright",
+            Description = "",
+            Callback = function()
+                game:GetService("Lighting"):GetPropertyChangedSignal("FogEnd"):Connect(removeFog)
+                game:GetService("Lighting"):GetPropertyChangedSignal("FogStart"):Connect(removeFog)
+                game:GetService("Lighting"):GetPropertyChangedSignal("FogColor"):Connect(removeFog)
+
+                game:GetService("Lighting").Changed:Connect(removeFog)
+
+                local Light = game:GetService("Lighting")
+
+                function dofullbright()
+                    Light.Ambient = Color3.new(1, 1, 1)
+                    Light.ColorShift_Bottom = Color3.new(1, 1, 1)
+                    Light.ColorShift_Top = Color3.new(1, 1, 1)
+                end
+
+                dofullbright()
+
+                Light.LightingChanged:Connect(dofullbright)
+            end
+        }
+    )
+
+    Tabs.1:AddButton(
+        {
+            Title = "Super Fix Lag",
+            Description = "",
+            Callback = function()
+                local Lighting = game:GetService("Lighting")
+                local Players = game:GetService("Players")
+                local LocalPlayer = Players.LocalPlayer
+                local Workspace = game:GetService("Workspace")
+
+                local function CanChangeColor(obj)
+                    return obj:IsA("BasePart") and obj:IsDescendantOf(Workspace) and
+                        not obj:IsDescendantOf(LocalPlayer.Character)
+                end
+
+                local function MakeStone(obj)
+                    if CanChangeColor(obj) then
+                        pcall(
+                            function()
+                                obj.Color = Color3.fromRGB(115, 115, 115)
+                                obj.Material = Enum.Material.SmoothPlastic
+                                obj.Reflectance = 0
+                            end
+                        )
+                    end
+                end
+
+                for _, obj in pairs(Workspace:GetDescendants()) do
+                    MakeStone(obj)
+                end
+
+                Workspace.DescendantAdded:Connect(
+                    function(obj)
+                        task.wait(0.1) -- Giảm độ trễ để tránh giảm hiệu suất quá mức
+                        MakeStone(obj)
+                    end
+                )
+
+                local function RemoveUnnecessaryEffects(obj)
+                    pcall(
+                        function()
+                            if
+                                obj:IsA("ParticleEmitter") or obj:IsA("Beam") or obj:IsA("Trail") or obj:IsA("Fire") or
+                                    obj:IsA("Smoke") or
+                                    obj:IsA("Sparkles") or
+                                    obj:IsA("Explosion") or
+                                    obj:IsA("Highlight") or
+                                    obj:IsA("Decal") or
+                                    obj:IsA("Texture") or
+                                    obj:IsA("PointLight") or
+                                    obj:IsA("SurfaceLight") or
+                                    obj:IsA("SpotLight")
+                             then
+                                obj:Destroy()
+                            end
+                        end
+                    )
+                end
+
+                for _, obj in pairs(Workspace:GetDescendants()) do
+                    RemoveUnnecessaryEffects(obj)
+                end
+
+                Workspace.DescendantAdded:Connect(
+                    function(obj)
+                        task.wait(0.1) -- Tối ưu độ trễ
+                        RemoveUnnecessaryEffects(obj)
+                    end
+                )
+
+                pcall(
+                    function()
+                        Lighting.GlobalShadows = false
+                        Lighting.Brightness = 2
+                        Lighting.Ambient = Color3.new(1, 1, 1)
+                        Lighting.OutdoorAmbient = Color3.new(1, 1, 1)
+                        Lighting.FogEnd = 1000000
+                        Lighting.Technology = Enum.Technology.Compatibility
+
+                        local sky = Lighting:FindFirstChild("Sky")
+                        if sky then
+                            sky:Destroy()
+                        end
+                    end
+                )
+
+                local function ResetCharacterAppearance(character)
+                    pcall(
+                        function()
+                            for _, obj in pairs(character:GetChildren()) do
+                                if obj:IsA("Shirt") or obj:IsA("Pants") or obj:IsA("ShirtGraphic") then
+                                    obj:Destroy()
+                                end
+                                if obj:IsA("BodyColors") then
+                                    obj:Destroy()
+                                end
+                            end
+
+                            for _, part in pairs(character:GetChildren()) do
+                                if part:IsA("BasePart") then
+                                    part.Color = Color3.fromRGB(163, 162, 165) -- Màu mặc định
+                                end
+                            end
+                        end
+                    )
+                end
+
+                if LocalPlayer.Character then
+                    ResetCharacterAppearance(LocalPlayer.Character)
+                end
+
+                LocalPlayer.CharacterAdded:Connect(
+                    function(character)
+                        task.wait(1)
+                        ResetCharacterAppearance(character)
+                    end
+                )
+
+                local function RemoveEnemyClothes()
+                    if Workspace:FindFirstChild("Enemies") then
+                        for _, enemy in pairs(Workspace.Enemies:GetChildren()) do
+                            ResetCharacterAppearance(enemy)
+                        end
+                    end
+                end
+
+                RemoveEnemyClothes()
+
+                if Workspace:FindFirstChild("Enemies") then
+                    Workspace.Enemies.ChildAdded:Connect(
+                        function(enemy)
+                            task.wait(1)
+                            ResetCharacterAppearance(enemy)
+                        end
+                    )
+                end
+
+                warn("Fix Lag Completed!")
+            end
+        }
+    )
+
+    Tabs.1:AddButton(
+        {
+            Title = "Chống lag 90%",
+            Description = "ko Key",
+            Callback = function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/TurboLite/Script/main/FixLag.lua"))()
+            end
+        }
+    )
+----------------------------------------2----------------------------------------
+print("Loading Script Tab")
+wait(1)
+print("Loading Blox fruit Script")
+wait(.1)
+Tabs.2:AddParagraph({
+        Title = "Blox Fruits",
+        Content = "script của blox fruit"
+    })
+wait(5)
+Tabs.2:AddButton({
+        Title = "Redz Hub",
+        Description = "ko Key",  
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/refs/heads/main/Source.lua"))()
+        end
+    })
+    
+    -- redz old
+    
+    Tabs.2:AddButton({
+        Title = "Vxeze Hub",
+        Description = "ko Key",  
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Dex-Bear/Vxezehub/refs/heads/main/Skidlamcho.txt"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Angry Hub",
+        Description = "ko Key",  
+        Callback = function()
+            loadstring(game:HttpGet("https://gist.githubusercontent.com/angry5/ec20347a74aa4e46c71b15b6093eeaf5/raw/Angery.lua"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Tsuo Hub",
+        Description = "ko Key",  
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Tsuo7/TsuoHub/main/Tsuoscripts"))()
+        end
+    })
+Tabs.2:AddButton({
+        Title = "Teddy HOP",
+        Description = "HOP SV và ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/skibiditoiletgojo/Haidepzai/refs/heads/main/Teddy-Premium"))()
+        end
+    })
+    
+Tabs.2:AddButton({
+        Title = "Auto Bounty Sera Hub",
+        Description = "có Key",
+        Callback = function()
+            getgenv().config = {
+    ["Use Race"] = {
+        ["V4"] = true,
+        ["V3"] = true
+    },
+    ["BypassTp"] = false,
+    ["Info Screen"] = true,
+    ["SafeHealth"] = 4000,
+    ["Webhooks"] = {
+        ["Toggle Webhook"] = true,
+        ["Link Webhook"] = ""
+    },
+    ["White Screen"] = false,
+    ["SkipFruit"] = {
+        "Portal-Portal"
+    },
+    ["Skip Race V4 User"] = true,
+    ["Team"] = "Pirates",
+    ["MaxBountyHunt"] = 30000000,
+    ["MinBountyHunt"] = 0,
+    ["MainSkillToggle"] = {
+        ["Sword"] = {
+            ["Enable"] = true,
+            ["Skills"] = {
+                ["X"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 0.2
+                },
+                ["Z"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 0.2
+                }
+            },
+            ["Delay"] = 1
+        },
+        ["Blox Fruit"] = {
+            ["Enable"] = true,
+            ["Skills"] = {
+                ["X"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 2
+                },
+                ["C"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 0
+                },
+                ["Z"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 0
+                },
+                ["F"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 0
+                },
+                ["V"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 0
+                }
+            },
+            ["Delay"] = 2
+        },
+        ["Melee"] = {
+            ["Enable"] = true,
+            ["Skills"] = {
+                ["X"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 0
+                },
+                ["C"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 0
+                },
+                ["Z"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 2.5
+                }
+            },
+            ["Delay"] = 1.75
+        },
+        ["Gun"] = {
+            ["Enable"] = true,
+            ["Skills"] = {
+                ["X"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 0
+                },
+                ["Z"] = {
+                    ["Enable"] = true,
+                    ["HoldTime"] = 0
+                }
+            },
+            ["Delay"] = 1
+        }
+    }
+}
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LumosSera/Serra/refs/heads/main/Bounty.lua"))()
+        end
+    })
+    
+Tabs.2:AddButton({
+        Title = "Cokka Hub",
+        Description = "có Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/UserDevEthical/Loadstring/main/CokkaHub.lua"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Hoho Hub V4",
+        Description = "có Key",
+        Callback = function()
+            _G.HohoVersion = "v4"
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/acsu123/HOHO_H/main/Loading_UI"))()
+        end
+    })
+
+Tabs.2:AddButton({
+        Title = "Frost rươngt",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://frostware.onrender.com/fwchest"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Frost farm",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://frostware.onrender.com/fw"))()
+        end
+    })
+    
+    
+    Tabs.2:AddButton({
+        Title = "ThunderZ Chest",
+        Description = "ko Key",
+        Callback = function()
+        _G.Team = "Marine" -- "Marine" or "Pirate"
+_G.MetodeTeleport = "Tween" --"Instant" or "Tween"
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/ThundarZ/Welcome/refs/heads/main/Main/BloxFruit/Chest/AllDevices.lua"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Flow Hub",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Yumiara/Overflow/refs/heads/main/Main.lua"))()
+        end
+    })
+    Tabs.2:AddButton({
+        Title = "Forge Hub",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Skzuppy/forge-hub/main/loader.lua"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Lion Hub",
+        Description = "ko Key",
+        Callback = function()
+           getgenv().Team = "Pirates"
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/NHMdz/BloxFruit/refs/heads/main/Lion%20Hub.lua"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Volcano Hub",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/wpisstestfprg/Volcano/refs/heads/main/VolcanoNewUpdated.luau"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Hiru Hub(Hicu)",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/NGUYENVUDUY1/Dev-Hiru/refs/heads/main/HiruHub.lua"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Astral Hub",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Overgustx2/Main/refs/heads/main/BloxFruits_25.html"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Quantum Onyx Hub",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Trustmenotcondom/QTONYX/refs/heads/main/QuantumOnyx.lua"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Relz Hub",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/farghii/relzhub/main/execute.hack"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Alchemy Hub",
+        Description = "có Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://scripts.alchemyhub.xyz"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Blue X Hub",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Dev-BlueX/BlueX-Hub/refs/heads/main/Main.lua"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Kncrypt Hub",
+        Description = "có Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/3345-c-a-t-s-u-s/Kncrypt/refs/heads/main/sources/BloxFruit.lua"))()
+        end
+    })
+    
+    Tabs.2:AddButton({
+        Title = "Xero Hub",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Xero2409/XeroHub/refs/heads/main/main.lua"))()
+        end
+    })
+   
+   Tabs.2:AddButton({
+        Title = "Rubu Hub",
+        Description = "ko Key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/LuaCrack/RubuRoblox/refs/heads/main/Rububf"))()
+        end
+    })
+    
+   Tabs.2:AddButton({
+        Title = "Speed X Hub",
+        Description = "ko key",
+        Callback = function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/AhmadV99/Speed-Hub-X/main/Speed%20Hub%20X.lua"))()
+        end
+    })
+    
+    
+    Tabs.All:AddButton({
+        Title = "Executor Check",
+        Description = "Press F9 or chat /console to open console!",
+        Callback = function()
+            print("----------------------------------------UNC----------------------------------------")
+            wait(.1)
+            loadstring(game:HttpGet("https://github.com/ltseverydayyou/uuuuuuu/blob/main/UNC%20test?raw=true"))()
+            wait(.1)
+            print("----------------------------------------Level Exectr----------------------------------------")
+            wait(.1)
+            printidentity()
+            print("----------------------------------------Executor Name Checker----------------------------------------")
+            wait(.1)
+            print(identifyexecutor())
+        end
+    })
+----------------------------------------ScriptHub----------------------------------------
+print("Loading Script Hub")
+wait(.1)
+Tabs.ScrH:AddParagraph({
+        Title = "Script Hub And Get Executor",
+        Content = "So Cool,Click the Button to Copy"
+    })
+    
+    Tabs.ScrH:AddButton({
+        Title = "Script Blox",
+        Description = "https://scriptblox.com",
+        Callback = function()
+            setclipboard("https://scriptblox.com")
+        end
+    })
+    
+----------------------------------------ScrP----------------------------------------
+print("Loading Server Tab")
+wait(.5)
+print("Loading Info Tab")
+wait(.1)
+Tabs.If:AddParagraph({
+        Title = "Người chơi",
+        Content = "Thank "..game.Players.LocalPlayer.Name.." for use script!"
+    })
+
+    Tabs.If:AddParagraph({
+        Title = "Rubo Hub",
+        Content = "Script được làm bởi lồn và buồi"
+    })
+  
+    Tabs.If:AddButton({
+        Title = "Youtube",
+        Description = "",
+        Callback = function()
+            setclipboard("nick yt của m")
+        end
+    })
+        
+    Tabs.If:AddButton({
+        Title = "Discord",
+        Description = "",
+        Callback = function()
+            setclipboard("discord của m")
+        end
+    })
+ 
+    wait(.1)
+
+----------------------------------------LoadedNotify----------------------------------------
+    game.StarterGui:SetCore("SendNotification", {
+     Title = "Rubo Hub";
+     Text = "Đăng tải";
+     Icon = "";
+     Duration = "2";
+})
+wait(.1) 
+print("Đăng tải")
+wait(.1)
+warn("Cali Con Cặc")
