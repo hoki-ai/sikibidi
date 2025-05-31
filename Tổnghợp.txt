@@ -94,7 +94,7 @@ ImageLabel.BackgroundTransparency = 1
 ImageLabel.BorderSizePixel = 1
 ImageLabel.BorderColor3 = Color3.fromRGB(27, 42, 53)
 ImageLabel.ImageColor3 = Color3.fromRGB(255, 255, 255)
-ImageLabel.Image = "http://www.roblox.com/asset/?id=5009915795" -- Thay 5009915795 Bằng ảnh của anh em
+ImageLabel.Image = "http://www.roblox.com/asset/?id=82083472602102"
 
 UICorner.CornerRadius = UDim.new(1, 0)
 UICorner.Parent = Frame
@@ -148,7 +148,7 @@ end)
 print("Loading Main Ui")
 wait(.1)
 game.StarterGui:SetCore("SendNotification", {
-     Title = "Lonely Hub";
+     Title = "ruboa Hub";
      Text = "Loading Main Ui";
      Icon = "";
      Duration = "2";
@@ -161,12 +161,12 @@ local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/d
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
 local Window = Fluent:CreateWindow({
-    Title = "Tên Hub",
-    SubTitle = "by tên thằng skid",
+    Title = "ruboa Hub",
+    SubTitle = "đéo",
     TabWidth = 160,
-    Size = UDim2.fromOffset(500, 350),
+    Size = UDim2.fromOffset(450, 300),
     Acrylic = true, 
-    Theme = "Dark",
+    Theme = "Light",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
 ----------------------------------------Tab----------------------------------------
@@ -540,7 +540,7 @@ Tabs.BF:AddButton({
         Title = "Redz Hub",
         Description = "NoKey",  
         Callback = function()
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/realredz/BloxFruits/refs/heads/main/Source.lua"))()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/tlredz/Scripts/refs/heads/main/main.luau"))(Settings)
         end
     })
     
@@ -782,7 +782,7 @@ _G.MetodeTeleport = "Tween" --"Instant" or "Tween"
     })
     
     Tabs.BF:AddButton({
-        Title = "Relz Hub",
+        Title = "Relz fake Hub",
         Description = "No Key",
         Callback = function()
             loadstring(game:HttpGet("https://raw.githubusercontent.com/farghii/relzhub/main/execute.hack"))()
