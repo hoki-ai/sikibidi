@@ -2,7 +2,7 @@ local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao1
 
 local Window = redzlib:MakeWindow({
   Title = "ruboa Roblox",
-  SubTitle = "by real_tbeo",
+  SubTitle = "by ruboa Roblox",
   SaveFolder = "Redz | redz lib v5.lua"
 })
 
